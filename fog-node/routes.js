@@ -7,11 +7,13 @@ router.post('/', (req, res) => {
 
     const result = processStationData(req.body);
 
-    if (!result.valid) {
+    if (!result.success) {
+
         return res.status(400).json(result);
+
     }
 
-    res.status(200).json(result);
+    return res.status(200).json(result);
 
 });
 

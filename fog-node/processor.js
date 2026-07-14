@@ -5,28 +5,84 @@ import recommendStation from './recommendationEngine.js';
 
 const processStationData = (data) => {
 
+    console.log('\n===================================');
+    console.log(`📥 Data received from ${data.stationId}`);
+
     // Validate incoming data
     const validation = validateStationData(data);
 
     if (!validation.valid) {
-        return validation;
+
+        console.log('❌ Validation Failed');
+
+        return {
+            success: false,
+            message: validation.message
+        };
+
     }
 
-    // Store the latest reading
+    console.log('✅ Validation Passed');
+
+    // Store latest station reading
     stationStore.set(data.stationId, data);
+
+    console.log('💾 Latest reading stored');
 
     // Generate alerts
     const alerts = generateAlerts(data);
 
-    // Find the best alternative station
+    if (alerts.length > 0) {
+
+        console.log('⚠ Alerts');
+
+        alerts.forEach(alert =>
+            console.log(`   • ${alert}`)
+        );
+
+    } else {
+
+        console.log('✅ No Alerts');
+
+    }
+
+    // Recommend another charging station
     const recommendation = recommendStation(data.stationId);
 
+    if (recommendation) {
+
+        console.log(`🚗 Recommendation: ${recommendation}`);
+
+    } else {
+
+        console.log('🚗 No Recommendation');
+
+    }
+
+    console.log('===================================\n');
+
     return {
-        valid: true,
+
+        success: true,
+
         station: data.stationId,
+
         alerts,
-        recommendation
+
+        recommendation,
+
+        summary: {
+
+            queueLength: data.queueLength,
+
+            availableChargers: data.availableChargers,
+
+            chargerTemperature: data.chargerTemperature
+
+        }
+
     };
+
 };
 
 export default processStationData;
