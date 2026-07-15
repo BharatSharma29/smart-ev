@@ -2,13 +2,14 @@ import stationStore from './stationStore.js';
 import validateStationData from './validator.js';
 import generateAlerts from './alertEngine.js';
 import recommendStation from './recommendationEngine.js';
+import sendToCloud from '../backend/awsClient.js';
 
-const processStationData = (data) => {
+const processStationData = async (data) => {
 
     console.log('\n===================================');
     console.log(`📥 Data received from ${data.stationId}`);
 
-    // Validate incoming data
+    // Step 1: Validate incoming data
     const validation = validateStationData(data);
 
     if (!validation.valid) {
@@ -24,12 +25,12 @@ const processStationData = (data) => {
 
     console.log('✅ Validation Passed');
 
-    // Store latest station reading
+    // Step 2: Store latest station reading
     stationStore.set(data.stationId, data);
 
     console.log('💾 Latest reading stored');
 
-    // Generate alerts
+    // Step 3: Generate alerts
     const alerts = generateAlerts(data);
 
     if (alerts.length > 0) {
@@ -46,7 +47,7 @@ const processStationData = (data) => {
 
     }
 
-    // Recommend another charging station
+    // Step 4: Recommend another charging station
     const recommendation = recommendStation(data.stationId);
 
     if (recommendation) {
@@ -56,6 +57,19 @@ const processStationData = (data) => {
     } else {
 
         console.log('🚗 No Recommendation');
+
+    }
+
+    // Step 5: Send processed data to the cloud
+    const cloudResponse = await sendToCloud(data);
+
+    if (cloudResponse.success) {
+
+        console.log('☁ Successfully prepared for cloud transmission');
+
+    } else {
+
+        console.log('☁ Cloud transmission failed');
 
     }
 
@@ -70,6 +84,8 @@ const processStationData = (data) => {
         alerts,
 
         recommendation,
+
+        cloud: cloudResponse,
 
         summary: {
 
