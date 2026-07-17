@@ -9,7 +9,9 @@ const processStationData = async (data) => {
     console.log('\n===================================');
     console.log(`📥 Data received from ${data.stationId}`);
 
-    // Step 1: Validate incoming data
+    /*
+     * Step 1 - Validate incoming data
+     */
     const validation = validateStationData(data);
 
     if (!validation.valid) {
@@ -17,57 +19,100 @@ const processStationData = async (data) => {
         console.log('❌ Validation Failed');
 
         return {
+
             success: false,
+
             message: validation.message
+
         };
 
     }
 
     console.log('✅ Validation Passed');
 
-    // Step 2: Store latest station reading
-    stationStore.set(data.stationId, data);
+    /*
+     * Step 2 - Store latest station reading
+     */
+    stationStore.set(
+
+        data.stationId,
+
+        data
+
+    );
 
     console.log('💾 Latest reading stored');
 
-    // Step 3: Generate alerts
+    /*
+     * Step 3 - Generate alerts
+     */
     const alerts = generateAlerts(data);
 
     if (alerts.length > 0) {
 
         console.log('⚠ Alerts');
 
-        alerts.forEach(alert =>
-            console.log(`   • ${alert}`)
+        alerts.forEach(
+
+            alert => console.log(`   • ${alert}`)
+
         );
 
-    } else {
+    }
+    else {
 
         console.log('✅ No Alerts');
 
     }
 
-    // Step 4: Recommend another charging station
-    const recommendation = recommendStation(data.stationId);
+    /*
+     * Step 4 - Recommendation
+     */
+    const recommendation = recommendStation(
+
+        data.stationId
+
+    );
 
     if (recommendation) {
 
         console.log(`🚗 Recommendation: ${recommendation}`);
 
-    } else {
+    }
+    else {
 
         console.log('🚗 No Recommendation');
 
     }
 
-    // Step 5: Send processed data to the cloud
-    const cloudResponse = await sendToCloud(data);
+    /*
+     * Step 5 - Build processed payload
+     */
+    const processedData = {
+
+        ...data,
+
+        alerts,
+
+        recommendation
+
+    };
+
+    /*
+     * Step 6 - Send processed data to Cloud
+     */
+    const cloudResponse = await sendToCloud(
+
+        processedData
+
+    );
 
     if (cloudResponse.success) {
 
         console.log('☁ Successfully prepared for cloud transmission');
 
-    } else {
+    }
+    else {
 
         console.log('☁ Cloud transmission failed');
 
@@ -79,23 +124,9 @@ const processStationData = async (data) => {
 
         success: true,
 
-        station: data.stationId,
+        ...processedData,
 
-        alerts,
-
-        recommendation,
-
-        cloud: cloudResponse,
-
-        summary: {
-
-            queueLength: data.queueLength,
-
-            availableChargers: data.availableChargers,
-
-            chargerTemperature: data.chargerTemperature
-
-        }
+        cloud: cloudResponse
 
     };
 

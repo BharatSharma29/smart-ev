@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        EV Charging Monitoring Dashboard
+    </title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <header>
+
+        <h1>
+            EV Charging Monitoring Dashboard
+        </h1>
+
+        <p id="lastUpdated">
+            Last Updated: --
+        </p>
+
+    </header>
+
+    <section class="summary">
+
+        <div class="summary-card">
+
+            <h2>Stations Online</h2>
+
+            <p id="stationCount">0</p>
+
+        </div>
+
+        <div class="summary-card">
+
+            <h2>Available Chargers</h2>
+
+            <p id="availableChargers">0</p>
+
+        </div>
+
+        <div class="summary-card">
+
+            <h2>Occupied Chargers</h2>
+
+            <p id="occupiedChargers">0</p>
+
+        </div>
+
+        <div class="summary-card">
+
+            <h2>Average Queue</h2>
+
+            <p id="averageQueue">0</p>
+
+        </div>
+
+    </section>
+
+    <section
+        id="stationContainer"
+        class="station-container">
+
+    </section>
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>

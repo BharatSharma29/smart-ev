@@ -1,31 +1,44 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import stationRoutes from './routes.js';
-
-dotenv.config();
+import routes from './routes.js';
 
 const app = express();
 
 const PORT = process.env.PORT || 4000;
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(cors());
+
 app.use(express.json());
 
-app.use('/api/stations', stationRoutes);
+/*
+ * Serve dashboard files
+ */
+app.use(
 
-app.get('/', (req, res) => {
+    express.static(
 
-    res.json({
-        service: 'Cloud API',
-        status: 'Running'
-    });
+        path.join(__dirname, 'dashboard')
 
-});
+    )
 
+);
+
+/*
+ * API routes
+ */
+app.use('/api/stations', routes);
+
+/*
+ * Start server
+ */
 app.listen(PORT, () => {
 
-    console.log(`☁ Cloud API running on http://localhost:${PORT}`);
+    console.log(`Cloud API running on port ${PORT}`);
 
 });
