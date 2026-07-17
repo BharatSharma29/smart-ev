@@ -66,7 +66,7 @@ const processStationData = async (data) => {
     }
 
     /*
-     * Step 4 - Recommendation
+     * Step 4 - Generate recommendation
      */
     const recommendation = recommendStation(
 
@@ -76,7 +76,12 @@ const processStationData = async (data) => {
 
     if (recommendation) {
 
-        console.log(`🚗 Recommendation: ${recommendation}`);
+        console.log('🚗 Recommendation');
+        console.log(`   Station             : ${recommendation.stationId}`);
+        console.log(`   Available Chargers  : ${recommendation.availableChargers}`);
+        console.log(`   Queue Length        : ${recommendation.queueLength}`);
+        console.log(`   Estimated Wait Time : ${recommendation.estimatedWaitTime} min`);
+        console.log(`   Reason              : ${recommendation.reason}`);
 
     }
     else {
