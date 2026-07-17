@@ -1,22 +1,46 @@
+import axios from 'axios';
+
+const CLOUD_API_URL = 'http://localhost:4000/api/stations';
+
 const sendToCloud = async (stationData) => {
 
-    console.log('\n☁ Cloud Service');
+    try {
 
-    console.log(
-        `Preparing payload for ${stationData.stationId}`
-    );
+        const response = await axios.post(
 
-    /*
-     * AWS API Gateway will be called here later.
-     */
+            CLOUD_API_URL,
 
-    return {
+            stationData
 
-        success: true,
+        );
 
-        message: 'Cloud transmission simulated.'
+        return response.data;
 
-    };
+    }
+
+    catch (error) {
+
+        console.error('\n☁ Cloud API Error');
+
+        if (error.response) {
+
+            console.error(error.response.data);
+
+        } else {
+
+            console.error(error.message);
+
+        }
+
+        return {
+
+            success: false,
+
+            message: 'Cloud API unavailable.'
+
+        };
+
+    }
 
 };
 

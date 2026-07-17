@@ -2,7 +2,7 @@ import stationStore from './stationStore.js';
 import validateStationData from './validator.js';
 import generateAlerts from './alertEngine.js';
 import recommendStation from './recommendationEngine.js';
-import sendToCloud from '../backend/awsClient.js';
+import sendToCloud from '../cloud/cloudService.js';
 
 const processStationData = async (data) => {
 
