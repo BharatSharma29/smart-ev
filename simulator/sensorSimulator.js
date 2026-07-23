@@ -13,63 +13,102 @@ const sendStationData = async (station) => {
     try {
 
         // Generate sensor data
-        const data = generateStationData(station);
+        const sensorData = generateStationData(station);
 
         // Send to Fog Node
         const { data: response } = await axios.post(
+
             FOG_NODE_URL,
-            data
+
+            sensorData
+
         );
 
         console.log(`\n📤 ${station.id}`);
 
         console.log('---------------- Station Data ----------------');
 
-        console.table(data);
+        console.table(sensorData);
 
         console.log('\n✅ Fog Node Response');
 
         console.log(`Processed Successfully : ${response.success}`);
 
-        console.log(`Station               : ${response.station}`);
+        console.log(`Station               : ${response.stationId}`);
 
-        console.log(
-            `Recommendation        : ${
-                response.recommendation ?? 'None'
-            }`
-        );
+        if (response.recommendation) {
 
-        if (response.alerts.length === 0) {
+            console.log('\n🚗 Recommendation');
 
-            console.log('Alerts                : None');
+            console.log(
+                `Station               : ${response.recommendation.stationId}`
+            );
+
+            console.log(
+                `Available Chargers    : ${response.recommendation.availableChargers}`
+            );
+
+            console.log(
+                `Queue Length          : ${response.recommendation.queueLength}`
+            );
+
+            console.log(
+                `Estimated Wait        : ${response.recommendation.estimatedWaitTime} min`
+            );
+
+            console.log(
+                `Reason                : ${response.recommendation.reason}`
+            );
 
         } else {
 
-            console.log('Alerts');
+            console.log('\n🚗 Recommendation : None');
 
-            response.alerts.forEach(alert =>
-                console.log(`   • ${alert}`)
+        }
+
+        if (response.alerts.length === 0) {
+
+            console.log('\n⚠ Alerts : None');
+
+        } else {
+
+            console.log('\n⚠ Alerts');
+
+            response.alerts.forEach(
+
+                alert => console.log(`   • ${alert}`)
+
             );
 
         }
 
-        console.log('\nSummary');
+        console.log('\n📊 Processed Station Data');
 
         console.log(
-            `Queue Length          : ${response.summary.queueLength}`
+            `Available Chargers    : ${response.availableChargers}`
         );
 
         console.log(
-            `Available Chargers    : ${response.summary.availableChargers}`
+            `Occupied Chargers     : ${response.occupiedChargers}`
         );
 
         console.log(
-            `Temperature           : ${response.summary.chargerTemperature}°C`
+            `Queue Length          : ${response.queueLength}`
+        );
+
+        console.log(
+            `Temperature           : ${response.chargerTemperature} °C`
+        );
+
+        console.log(
+            `Estimated Wait        : ${response.estimatedWaitTime} min`
         );
 
         console.log('\n=============================================');
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(`\n❌ Failed to send ${station.id}`);
 
@@ -77,11 +116,11 @@ const sendStationData = async (station) => {
 
             console.error(`Status Code : ${error.response.status}`);
 
-            console.error('Fog Node Response:');
-
             console.log(error.response.data);
 
-        } else {
+        }
+
+        else {
 
             console.error(error.message);
 

@@ -4,11 +4,11 @@ const recommendStation = (currentStationId) => {
 
     let bestStation = null;
 
+    let highestScore = Number.NEGATIVE_INFINITY;
+
     for (const station of stationStore.values()) {
 
-        /*
-         * Skip the station that sent the data.
-         */
+        // Skip the station that generated the current reading
         if (station.stationId === currentStationId) {
 
             continue;
@@ -16,46 +16,25 @@ const recommendStation = (currentStationId) => {
         }
 
         /*
-         * First station becomes the initial recommendation.
-         */
-        if (!bestStation) {
-
-            bestStation = station;
-
-            continue;
-
-        }
-
-        /*
-         * Prefer the station with:
-         * 1. More available chargers
-         * 2. Lower queue length
-         * 3. Lower estimated waiting time
+         * Station Scoring
+         *
+         * Higher score = Better recommendation
+         *
+         * Available chargers are weighted heavily.
+         * Queue length and waiting time reduce the score.
          */
 
-        if (
+        const score =
 
-            station.availableChargers > bestStation.availableChargers ||
+            (station.availableChargers * 10)
 
-            (
+            - (station.queueLength * 3)
 
-                station.availableChargers === bestStation.availableChargers &&
+            - station.estimatedWaitTime;
 
-                station.queueLength < bestStation.queueLength
+        if (score > highestScore) {
 
-            ) ||
-
-            (
-
-                station.availableChargers === bestStation.availableChargers &&
-
-                station.queueLength === bestStation.queueLength &&
-
-                station.estimatedWaitTime < bestStation.estimatedWaitTime
-
-            )
-
-        ) {
+            highestScore = score;
 
             bestStation = station;
 
@@ -75,12 +54,16 @@ const recommendStation = (currentStationId) => {
 
         availableChargers: bestStation.availableChargers,
 
+        occupiedChargers: bestStation.occupiedChargers,
+
         queueLength: bestStation.queueLength,
 
         estimatedWaitTime: bestStation.estimatedWaitTime,
 
+        score: highestScore,
+
         reason:
-            'Highest charger availability with the shortest expected waiting time.'
+            'Recommended based on charger availability, queue length, and estimated waiting time.'
 
     };
 
